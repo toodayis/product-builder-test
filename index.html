@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미국 주식 인사이트</title>
+    <style>
+        :root {
+            --bg: #03142b;
+            --card: rgba(255,255,255,0.08);
+            --text: #f7f9ff;
+            --accent: #4fd1ff;
+            --accent-2: #7c3aed;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, sans-serif;
+            background: radial-gradient(circle at top, #1f3a73 0%, #03142b 45%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        header {
+            padding: 40px 24px 20px;
+            text-align: center;
+        }
+        .hero {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .hero h1 {
+            font-size: clamp(2.8rem, 4vw, 4.5rem);
+            line-height: 1.05;
+            margin: 0;
+        }
+        .hero p {
+            margin: 24px auto;
+            max-width: 720px;
+            font-size: 1.1rem;
+            color: #cfd9ff;
+            line-height: 1.7;
+        }
+        .search-panel {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: 1fr auto;
+            max-width: 760px;
+            margin: 0 auto 48px;
+        }
+        .search-panel input {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            padding: 18px 22px;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+        }
+        .search-panel button {
+            border: none;
+            border-radius: 14px;
+            padding: 18px 26px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #04121d;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .stock-grid, .stats-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            margin: 0 auto 50px;
+            max-width: 1100px;
+            padding: 0 24px;
+        }
+        .stock-card, .stat-card {
+            padding: 24px;
+            border-radius: 24px;
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .stock-card {
+            display: grid;
+            gap: 16px;
+        }
+        .stock-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .stock-label {
+            font-size: 1rem;
+            color: #9bb4ff;
+            font-weight: 600;
+        }
+        .stock-symbol {
+            font-size: 0.95rem;
+            color: #7c82b8;
+        }
+        .stock-price {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+        .stock-change {
+            font-size: 1rem;
+            color: #c1d6ff;
+        }
+        .stat-card h2 {
+            margin: 0 0 14px;
+            font-size: 1rem;
+            color: #9bb4ff;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .stat-card p {
+            margin: 0;
+            font-size: 2rem;
+            line-height: 1.1;
+        }
+        .analysis {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+            display: grid;
+            gap: 24px;
+            grid-template-columns: 1fr 1fr;
+        }
+        .panel {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 28px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .panel h3 {
+            margin-top: 0;
+            font-size: 1.2rem;
+        }
+        .panel p {
+            color: #d6dcf8;
+            line-height: 1.7;
+        }
+        .list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0;
+        }
+        .list li {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .list li::before {
+            content: '•';
+            color: var(--accent);
+            font-size: 1.4rem;
+            line-height: 1;
+            margin-top: 2px;
+        }
+        .chart {
+            min-height: 300px;
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(79,209,255,0.15), rgba(124,58,237,0.08));
+            border: 1px solid rgba(255,255,255,0.06);
+            display: grid;
+            place-items: center;
+            color: #c1d6ff;
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 32px;
+        }
+        footer {
+            text-align: center;
+            padding: 24px 24px 40px;
+            color: #8da1c8;
+            font-size: 0.95rem;
+        }
+        @media (max-width: 820px) {
+            .analysis {
+                grid-template-columns: 1fr;
+            }
+            .search-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <h1>미국 주식 인사이트</h1>
+        <p>대표 미국 주식의 실시간 시세와 핵심 지표를 빠르게 확인하세요.</p>
+        <div class="search-panel">
+            <input type="text" placeholder="티커 검색, 예: AAPL, TSLA, MSFT" aria-label="티커 입력">
+            <button type="button">분석하기</button>
+        </div>
+    </header>
+
+    <section class="stock-grid">
+        <article class="stock-card" id="googl-card">
+            <div class="stock-meta">
+                <span class="stock-label">알파벳</span>
+                <span class="stock-symbol">GOOGL</span>
+            </div>
+            <div class="stock-price" id="googl-price">--</div>
+            <div class="stock-change" id="googl-change">불러오는 중...</div>
+        </article>
+        <article class="stock-card" id="ko-card">
+            <div class="stock-meta">
+                <span class="stock-label">코카콜라</span>
+                <span class="stock-symbol">KO</span>
+            </div>
+            <div class="stock-price" id="ko-price">--</div>
+            <div class="stock-change" id="ko-change">불러오는 중...</div>
+        </article>
+    </section>
+
+    <section class="stats-grid">
+        <article class="stat-card">
+            <h2>현재 추세</h2>
+            <p>상승</p>
+        </article>
+        <article class="stat-card">
+            <h2>52주 변동</h2>
+            <p>+18.4%</p>
+        </article>
+        <article class="stat-card">
+            <h2>평균 거래량</h2>
+            <p>34.2M</p>
+        </article>
+        <article class="stat-card">
+            <h2>애널리스트 의견</h2>
+            <p>강력 매수</p>
+        </article>
+    </section>
+
+    <section class="analysis">
+        <div class="panel">
+            <h3>가격 흐름</h3>
+            <div class="chart">차트 영역: 지지, 저항, 모멘텀을 시각화합니다.</div>
+            <p>일별 및 주별 관점에서 주요 가격대를 확인할 수 있습니다. 최근 조정 구간 지지 시 다음 상승 기회가 예상됩니다.</p>
+        </div>
+
+        <div class="panel">
+            <h3>시장 신호</h3>
+            <ul class="list">
+                <li>모멘텀 점수: 83/100</li>
+                <li>상대 강도: S&P 500 대비 우수</li>
+                <li>변동성: 보통 수준</li>
+                <li>최근 모멘텀: 실적 발표 / 매크로 뉴스</li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h3>펀더멘털 요약</h3>
+            <p>수익성, 성장, 밸류에이션을 비교하여 업종 내 위치를 확인하세요. 매출 가이던스와 이익률 변화를 주목해야 합니다.</p>
+        </div>
+
+        <div class="panel">
+            <h3>전략 아이디어</h3>
+            <ul class="list">
+                <li>저항 상향 돌파 시 매수 관점을 유지하세요.</li>
+                <li>최근 스윙 저점 아래에 손절선을 설정하세요.</li>
+                <li>리스크가 제한된 옵션 전략을 검토하세요.</li>
+                <li>미국 경제 지표와 뉴스 흐름을 함께 확인하세요.</li>
+            </ul>
+        </div>
+    </section>
+
+    <footer>
+        미국 주식 실시간 분석 대시보드
+    </footer>
+
+    <script>
+        async function fetchPrice(symbol) {
+            const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Fetch failed');
+            }
+            const data = await response.json();
+            const quote = data.quoteResponse.result[0];
+            if (!quote) {
+                throw new Error('No quote data');
+            }
+            return {
+                price: quote.regularMarketPrice,
+                change: quote.regularMarketChange,
+                changePercent: quote.regularMarketChangePercent,
+            };
+        }
+
+        function formatChange(change, percent) {
+            const sign = change > 0 ? '+' : '';
+            const color = change > 0 ? '#4ade80' : change < 0 ? '#f87171' : '#c1d6ff';
+            return {
+                text: `${sign}${change.toFixed(2)} (${sign}${percent.toFixed(2)}%)`,
+                color,
+            };
+        }
+
+        async function refreshStocks() {
+            const stocks = [
+                { symbol: 'GOOGL', priceId: 'googl-price', changeId: 'googl-change' },
+                { symbol: 'KO', priceId: 'ko-price', changeId: 'ko-change' },
+            ];
+
+            for (const stock of stocks) {
+                try {
+                    const result = await fetchPrice(stock.symbol);
+                    document.getElementById(stock.priceId).textContent = `$${result.price.toFixed(2)}`;
+                    const formatted = formatChange(result.change, result.changePercent);
+                    const changeEl = document.getElementById(stock.changeId);
+                    changeEl.textContent = formatted.text;
+                    changeEl.style.color = formatted.color;
+                } catch (error) {
+                    const changeEl = document.getElementById(stock.changeId);
+                    changeEl.textContent = '가격 정보를 불러올 수 없습니다';
+                    changeEl.style.color = '#f87171';
+                }
+            }
+        }
+
+        refreshStocks();
+        setInterval(refreshStocks, 60000);
+    </script>
+</body>
+</html>
